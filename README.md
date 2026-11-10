@@ -19,7 +19,11 @@ Python tools for processing spectroelectrochemistry data, used mainly by the Gin
 * `cv`: cyclic voltammetry loading and analysis
 * `eis`: electrochemical impedance spectroscopy loading and plotting
 
+## Requirements
+Python 3.11+ and pandas 3 (see `requirements.txt`).
+
 ## Installation
+The test data are stored with [Git LFS](https://git-lfs.com), so install it once (`git lfs install`) before cloning:
 ```
 git clone https://github.com/rajgiriUW/specechem_processing.git
 cd specechem_processing
@@ -27,14 +31,18 @@ pip install -e .
 ```
 
 ## Quick start
+Load the `.h5` files saved by the Python spectroelectrochemistry software:
 ```python
-from specechem_processing import uvvis, read_files
+from specechem_processing import uvvis_h5
 
-steps, specs, volts, dedope_steps, dedope_specs = read_files.read_files('path/to/data')
-data = uvvis.UVVis(steps, specs, volts)
-data.time_dep_spectra(specfiles=specs)
+data = uvvis_h5.convert_h5_python('sample1_run3_doping.h5')
+dedata = uvvis_h5.convert_h5_python('sample1_run3_dedoping.h5')  # pairs with sample1_run3_doping.h5
+
+data.single_wl_time(potential=0.6, wavelength=800)
 data.spec_echem_voltage(time=0)
+data.banded_fits(wl_start=700, wl_stop=900, voltage=0.6)
 ```
+`spectra_vs_time` is keyed by potential (V). Dedoping steps are all held at the same potential, so each is keyed by the doping step it follows, read from the paired doping file (pass `doping_path=` if it isn't next to the dedoping file with the same name). `current` is in A and `charge` is in C.
 
 A worked example is in `notebooks/UV-Vis Notebook_updated.ipynb`.
 
@@ -43,4 +51,4 @@ Run from the repository root:
 ```
 pytest tests/
 ```
-See `tests/uvvis_test/README.md` for how the expected values are generated.
+The tests use `tests/test_h5/sample1_run3_doping.h5` and `sample1_run3_dedoping.h5` and check results against the raw arrays in those files.

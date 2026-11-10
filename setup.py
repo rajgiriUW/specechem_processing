@@ -17,9 +17,10 @@ setup(
     license='MIT',
     url='https://github.com/rajgiriUW/specechem_processing',
 
+    python_requires='>=3.11',
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=['numpy >=1.18',
-                      'pandas >=2.0.1',
+                      'pandas >=3.0',
                       'scipy >=1.14',
                       'matplotlib >=3.6.0',
                       'seaborn',
