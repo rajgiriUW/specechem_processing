@@ -148,7 +148,7 @@ def convert_h5_python(h5_path):
     try:
         data = UVVis(None, None, None)
     except:
-        print('oect_processing package not installed, using fake Class object')
+        print('specechem_processing package not installed, using fake Class object')
         data = SEC
     current = {}
     with h5py.File(h5_path, 'r') as h5_file:

@@ -18,9 +18,7 @@ import pickle
 sys.path.insert(0, '../..')
 
 from pathlib import Path
-import oect_processing
-from oect_processing.specechem import uvvis, read_files, uvvis_h5, uvvis_plot
-from oect_processing.nonoect_utils import cv
+from specechem_processing import uvvis, read_files, uvvis_h5, uvvis_plot, cv
 from tests.uvvis_test import uvvis_inputs
 
 expected_values_folder = 'tests/uvvis_test/uvvis_expected_values'

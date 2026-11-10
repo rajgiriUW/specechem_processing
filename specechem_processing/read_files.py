@@ -100,3 +100,28 @@ def read_files(path):
         potentials[x] = np.round(pp[pot][0], 2)
 
     return stepfiles, specfiles, potentials, dedopestepfiles, dedopespecfiles
+
+
+def file_open(caption='Select folder'):
+    '''
+    Opens a PyQt5 folder dialog and returns the selected path.
+
+    Parameters
+    ----------
+    caption : str, optional
+        Dialog window title.
+
+    Returns
+    -------
+    str
+        Selected folder path.
+    '''
+
+    from PyQt5 import QtWidgets
+
+    app = QtWidgets.QApplication([])
+    path = QtWidgets.QFileDialog.getExistingDirectory(caption=caption)
+    app.closeAllWindows()
+    app.exit()
+
+    return str(path)

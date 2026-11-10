@@ -1,0 +1,15 @@
+*.pyc
+__pycache__/
+*.egg-info/
+build/
+dist/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+venv/
+.pytest_cache/
+
+# written by tests
+/dopingdata.pkl
+/dedopingdata.pkl
+tests/uvvis_test/test_specechem_with_dedoping/*.h5

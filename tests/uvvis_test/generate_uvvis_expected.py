@@ -12,8 +12,7 @@ import pandas as pd
 import pickle as pkl
 
 sys.path.insert(0, '../..')
-import oect_processing
-from oect_processing.specechem import uvvis, read_files
+from specechem_processing import uvvis, read_files
 from tests.uvvis_test import uvvis_inputs
 
 expected_values_folder = "uvvis_expected_values"
