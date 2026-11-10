@@ -215,7 +215,8 @@ class UVVis(object):
 
     def current_vs_time(self, stepfiles):
         '''
-        Loads step files to build self.current (current vs time) and self.charge (integrated).
+        Loads step files to build self.current (current vs time, A) and self.charge
+        (integrated current, C).
 
         Parameters
         ----------
@@ -241,7 +242,7 @@ class UVVis(object):
         charge.columns.name = 'Potential (V)'
         tx = self.current.index.values
         for p in self.current:
-            charge[p] = spint.trapezoid(self.current[p].values, x=self.current.index.values) * 1e3
+            charge[p] = spint.trapezoid(self.current[p].values, x=self.current.index.values)
 
         self.charge = charge
 

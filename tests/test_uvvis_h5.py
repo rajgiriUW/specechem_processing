@@ -19,7 +19,7 @@ import pandas as pd
 import pytest
 from scipy import integrate as spint
 
-from specechem_processing import uvvis_h5
+from specechem_processing import uvvis, uvvis_h5
 
 DATA = Path(__file__).parent / 'test_h5'
 FILES = {'doping': DATA / 'sample1_run3_doping.h5',
@@ -172,3 +172,16 @@ def test_banded_fits_bad_fittype(converted):
     data.single_wl_time(potential=0.6, wavelength=800)
     with pytest.raises(ValueError):
         data.banded_fits(voltage=0.6, fittype='linear')
+
+
+def test_current_vs_time_txt_charge_in_coulombs(tmp_path):
+    # Constant 2 mA for 10 s in a .txt step file -> 0.02 C
+    t = np.round(np.arange(0, 10.01, 0.1), 2)
+    step = tmp_path / 'steps(0).txt'
+    pd.DataFrame({'Time (s)': t, 'Corrected time (s)': t,
+                  'WE(1).Potential (V)': 0.5, 'WE(1).Current (A)': 2e-3,
+                  'Index': np.arange(len(t))}).to_csv(step, sep='\t', index=False)
+
+    data = uvvis.UVVis(potentials=[0.5])
+    data.current_vs_time([step])
+    assert data.charge[0.5].iloc[0] == pytest.approx(0.02)
