@@ -133,7 +133,7 @@ class UVVis(object):
         times = np.unique(pp['Time (s)'])
         times = times - times[0]
         per_run = int(len(pp) / runs[-1])
-        wl = pp['Wavelength (nm)'][0:per_run]
+        wl = pp['Wavelength (nm)'].iloc[0:per_run]
 
         index = np.round(wl.values, digits) if digits else wl.values
 
@@ -350,7 +350,7 @@ class UVVis(object):
         tuples for 'biexp' and 'stretched'.
         '''
 
-        wl_x = self.spectra_vs_time[voltage][wl_start:wl_stop]
+        wl_x = self.spectra_vs_time[voltage].loc[wl_start:wl_stop]
         tx = self.time_spectra_norm_sm.index.values
 
         if fittype not in ['exp', 'biexp', 'stretched']:

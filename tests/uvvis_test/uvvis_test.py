@@ -23,6 +23,29 @@ from tests.uvvis_test import uvvis_inputs
 
 expected_values_folder = 'tests/uvvis_test/uvvis_expected_values'
 
+# Expected values were generated with pandas 2, whose default CSV float parser
+# could be off in the last binary digit; pandas 3 parses exactly. Compare with a
+# tight tolerance instead of bit-exact equality so both versions pass.
+RTOL, ATOL = 1e-9, 1e-12
+
+
+def close(a, b):
+    # pandas 3 stores text labels (e.g. column 'Abs') as a string dtype, while the
+    # pandas-2 reference pickles use object dtype, so label dtypes are not compared.
+    try:
+        if isinstance(a, pd.DataFrame) and isinstance(b, pd.DataFrame):
+            pd.testing.assert_frame_equal(a, b, check_exact=False, rtol=RTOL, atol=ATOL,
+                                          check_index_type=False, check_column_type=False)
+        elif isinstance(a, pd.Series) and isinstance(b, pd.Series):
+            pd.testing.assert_series_equal(a, b, check_exact=False, rtol=RTOL, atol=ATOL,
+                                           check_index_type=False)
+        else:
+            a, b = np.asarray(a), np.asarray(b)
+            return a.shape == b.shape and np.allclose(a, b, rtol=RTOL, atol=ATOL, equal_nan=True)
+    except AssertionError:
+        return False
+    return True
+
 
 # the below tests take about 6 minutes in total to run
 
@@ -53,7 +76,7 @@ class TestUVVis:
             time_spectra = data_load[dataset]._single_time_spectra(spectra_path=read_files[specs][0],
                                                                    smooth=uvvis_inputs.single_time_smooth,
                                                                    digits=uvvis_inputs.single_time_digits)
-            assert time_spectra.equals(expected_single_time_spectra)
+            assert close(time_spectra, expected_single_time_spectra)
         except:
             assert False
 
@@ -83,7 +106,7 @@ class TestUVVis:
             spectra_vs_time = data_load[dataset].spectra_vs_time
             expected_spectra_vs_time = np.load(expected_values_folder, allow_pickle=True).item()
             assert spectra_vs_time.keys() == expected_spectra_vs_time.keys()
-            assert all(spectra_vs_time[k].equals(expected_spectra_vs_time[k]) for k in spectra_vs_time)
+            assert all(close(spectra_vs_time[k], expected_spectra_vs_time[k]) for k in spectra_vs_time)
         except:
             assert False
 
@@ -113,10 +136,10 @@ class TestUVVis:
                 os.path.join(expected_values_folder, "expected_%s_time_spectra_sm.npy" % data_label))
             expected_time_spectra_norm_sm = np.load(
                 os.path.join(expected_values_folder, "expected_%s_time_spectra_norm_sm.npy" % data_label))
-            assert np.array_equal(data_load[dataset].time_spectra, expected_time_spectra) \
-                   and np.array_equal(data_load[dataset].time_spectra_norm, expected_time_spectra_norm) \
-                   and np.array_equal(data_load[dataset].time_spectra_sm, expected_time_spectra_sm) \
-                   and np.array_equal(data_load[dataset].time_spectra_norm_sm, expected_time_spectra_norm_sm)
+            assert close(data_load[dataset].time_spectra, expected_time_spectra) \
+                   and close(data_load[dataset].time_spectra_norm, expected_time_spectra_norm) \
+                   and close(data_load[dataset].time_spectra_sm, expected_time_spectra_sm) \
+                   and close(data_load[dataset].time_spectra_norm_sm, expected_time_spectra_norm_sm)
         except:
             assert False
 
@@ -132,7 +155,7 @@ class TestUVVis:
                 os.path.join(expected_values_folder, "expected_%s_current.pkl" % data_label))
             expected_charge = pd.read_pickle(
                 os.path.join(expected_values_folder, "expected_%s_charge.pkl" % data_label))
-            assert current.equals(expected_current) and charge.equals(expected_charge)
+            assert close(current, expected_current) and close(charge, expected_charge)
         except:
             assert False
 
@@ -151,7 +174,7 @@ class TestUVVis:
                 os.path.join(expected_values_folder, "expected_%s_spectra.pkl" % data_label))
             expected_spectra_sm = pd.read_pickle(
                 os.path.join(expected_values_folder, "expected_%s_spectra_sm.pkl" % data_label))
-            assert spectra.equals(expected_spectra) and spectra_sm.equals(expected_spectra_sm)
+            assert close(spectra, expected_spectra) and close(spectra_sm, expected_spectra_sm)
         except:
             assert False
 
@@ -185,7 +208,7 @@ class TestUVVis:
             vt = data_load[dataset].vt
             expected_vt = pd.read_pickle(
                 os.path.join(expected_values_folder, "expected_%s_abs_vs_volt.pkl" % data_label))
-            assert vt.equals(expected_vt)
+            assert close(vt, expected_vt)
         except:
             assert False
 
